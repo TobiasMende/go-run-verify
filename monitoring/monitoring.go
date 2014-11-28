@@ -1,3 +1,6 @@
+// Package monitoring contains the RV framework architecture concerning the monitoring layer.
+//
+// RV Framework Layers:  logging -> MONITORING -> diagnosis -> mitigation
 package monitoring
 
 import (
@@ -10,19 +13,31 @@ var (
 	Trace, Info, Warning, Error = helpers.NewLayerLogger("monitoring")
 )
 
+// Type Monitor is the type of functions that should be executed as runtime verification monitors
 type Monitor func(*MonitorConfiguration, chan<- *MonitorConfiguration)
+
+// Type MonitorConfiguration holds the configuration of a single monitor
 type MonitorConfiguration struct {
-	In      chan *events.InEvent
-	Out     chan *events.MonitoringEvent
-	Info    MonitorInfo
+	// channel for receiving events from the logging layer
+	In chan *events.InEvent
+	// channel for sending events to the diagnosis layer
+	Out chan *events.MonitoringEvent
+	// information about the monitor (human readable)
+	Info MonitorInfo
+	// the monitor function itself
 	Handler Monitor
 }
 
+// Type MonitorInfo contains information about the monitor.
+// The information is supposed to be human readable. It is useful, when logging information about the monitor.
 type MonitorInfo struct {
-	Name        string
+	// The name of the monitor. E.g. "SendReceiveOrderMonitor"
+	Name string
+	// The description of the monitor, e.g. a LTL formula or a longer text, describing the sense of the monitor
 	Description string
 }
 
+// Function NewMonitorConfiguration is a helper function for creating a new MonitorConfiguration with pre-initialized channels and a given Monitor function
 func NewMonitorConfiguration(monitor Monitor) (config *MonitorConfiguration) {
 	Trace.Println("creating new monitor config")
 	config = &MonitorConfiguration{}
@@ -32,6 +47,9 @@ func NewMonitorConfiguration(monitor Monitor) (config *MonitorConfiguration) {
 	return config
 }
 
+// Dispatcher function is the entry point for events comming from the logging layer
+// The dispatcher should be executed as goroutine. Its job is the delegation of incoming events to alle monitors.
+// The dispatcher first executes all monitors as goroutines and than waits for incoming events for dispatching
 func Dispatcher(monitors []*MonitorConfiguration, in <-chan *events.InEvent) {
 	terminationChannel := make(chan *MonitorConfiguration, 1)
 
@@ -72,6 +90,7 @@ End:
 
 }
 
+// Helper function deleteMonitor deletes a monitor m from the array monitors.
 func deleteMonitor(monitors []*MonitorConfiguration, m *MonitorConfiguration) bool {
 	index := -1
 	for i, monitor := range monitors {
@@ -91,10 +110,13 @@ func deleteMonitor(monitors []*MonitorConfiguration, m *MonitorConfiguration) bo
 	return true
 }
 
+// Method PublishEvents sends an event to the diagnosis layer
 func (config *MonitorConfiguration) PublishEvent(state interface{}, decission helpers.MonitorDecission) {
 	config.Out <- &events.MonitoringEvent{time.Now(), state, decission, config.Info.Name, config.Info.Description}
 }
 
+// Watchdog is an example for a monitor.
+// The watchdog waits for incoming events and send the Decission BOTTOM, when no events are incoming for more than 5 seconds.
 func Watchdog(config *MonitorConfiguration, terminationRequest chan<- *MonitorConfiguration) {
 	t := 5 * time.Second
 Loop:

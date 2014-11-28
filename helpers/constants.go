@@ -1,3 +1,4 @@
+// Package helpers contains helper functions and constants that ar meant to be used by the entire RV framework
 package helpers
 
 type MonitorDecission byte
