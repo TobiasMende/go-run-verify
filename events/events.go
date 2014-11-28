@@ -3,6 +3,7 @@ package events
 import (
 	"encoding/binary"
 	"errors"
+	"github.com/TobiasMende/go-run-verify/helpers"
 	"time"
 )
 
@@ -31,8 +32,12 @@ type InEvent struct {
 
 type MonitoringEvent struct {
 	Created            time.Time
-	CurrentState       interface{}
-	CurrentDecission   interface{}
+	CurrentState       interface{} // TODO chose concrete type for state
+	CurrentDecission   helpers.MonitorDecission
 	MonitorName        string
 	MonitorDescription string
+}
+
+func NewMonitoringEvent(state interface{}, decission helpers.MonitorDecission, name string, description string) (evt *MonitoringEvent) {
+	return &MonitoringEvent{time.Now(), state, decission, name, description}
 }

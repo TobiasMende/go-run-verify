@@ -34,7 +34,7 @@ func unmarshalDemo(msg interface{}) (evt events.InEvent, err error) {
 	return evt, nil
 }
 
-func DemoLogHandler(outChannel chan<- events.InEvent, done <-chan bool) {
+func DemoLogHandler(outChannel chan<- *events.InEvent, done <-chan bool) {
 	var connector DemoLogConnector
 	logging.LogHandler(connector, unmarshalDemo, outChannel, done)
 }

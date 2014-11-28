@@ -9,7 +9,7 @@ var (
 	Trace, Info, Warning, Error = helpers.NewLayerLogger("diagnosis")
 )
 
-func Logger(ec <-chan events.MonitoringEvent) {
+func Logger(ec <-chan *events.MonitoringEvent) {
 	for {
 		evt, more := <-ec
 		if more {

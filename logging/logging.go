@@ -17,7 +17,7 @@ type LogConnector interface {
 	Close() error
 }
 
-func LogHandler(connector LogConnector, unmarshal Unmarshaler, outChannel chan<- events.InEvent, done <-chan bool) {
+func LogHandler(connector LogConnector, unmarshal Unmarshaler, outChannel chan<- *events.InEvent, done <-chan bool) {
 	err := connector.Init()
 	if err != nil {
 		Error.Println("Conection failed! Unable to continue: ", err)
@@ -40,7 +40,7 @@ Loop:
 				Warning.Println("Failed to unmarshal message. Contining: ", err)
 				continue // Invalid message, wait for next
 			}
-			outChannel <- evt
+			outChannel <- &evt
 		}
 	}
 	connector.Close()
