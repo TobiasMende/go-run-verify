@@ -9,11 +9,15 @@ var (
 	Trace, Info, Warning, Error = helpers.NewLayerLogger("diagnosis")
 )
 
-func Logger(ec <-chan *events.MonitoringEvent) {
+func Logger(name string, ec <-chan *events.MonitoringEvent) {
 	for {
 		evt, more := <-ec
 		if more {
-			Info.Println(evt)
+			if evt.CurrentDecission == helpers.BOTTOM {
+				Warning.Println(name, evt)
+			} else {
+				Info.Println(name, evt)
+			}
 		} else {
 			break
 		}

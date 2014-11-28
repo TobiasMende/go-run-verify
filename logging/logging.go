@@ -27,6 +27,7 @@ Loop:
 	for {
 		select {
 		case <-done:
+			close(outChannel)
 			break Loop
 		default:
 			msg, err := connector.Receive()

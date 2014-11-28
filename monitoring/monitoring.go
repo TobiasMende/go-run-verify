@@ -54,33 +54,41 @@ End:
 
 				}
 			} else {
+				Trace.Print("Dispatcher: in channel closed, delegating...")
 				for _, m := range monitors {
 					close(m.In)
-					close(m.Out)
 				}
+				Trace.Println(" done")
 				break End
 			}
 		case m := <-terminationChannel:
 			Info.Println("receiving termination request from ", m.Info)
-			index := -1
-			for i, monitor := range monitors {
-				if m == monitor {
-					index = i
-					break
-				}
-			}
-			if index >= 0 {
-				// Delete found monitor (by putting it to the end and reducing the size)
-				monitors[index], monitors[len(monitors)-1], monitors = monitors[len(monitors)-1], nil, monitors[:len(monitors)-1]
-			}
-
-			if len(monitors) == 0 {
+			if !deleteMonitor(monitors, m) {
 				break End
 			}
 		}
 	}
 	Info.Println("Terminating Dispatcher")
 
+}
+
+func deleteMonitor(monitors []*MonitorConfiguration, m *MonitorConfiguration) bool {
+	index := -1
+	for i, monitor := range monitors {
+		if m == monitor {
+			index = i
+			break
+		}
+	}
+	if index >= 0 {
+		// Delete found monitor (by putting it to the end and reducing the size)
+		monitors[index], monitors[len(monitors)-1], monitors = monitors[len(monitors)-1], nil, monitors[:len(monitors)-1]
+	}
+
+	if len(monitors) == 0 {
+		return false
+	}
+	return true
 }
 
 func (config *MonitorConfiguration) PublishEvent(state interface{}, decission helpers.MonitorDecission) {

@@ -22,12 +22,13 @@ func totalDemo() {
 	out := monitors[0].Out
 
 	go stubs.DemoLogHandler(in, done)
-	go diagnosis.Logger(out)
+	go diagnosis.Logger("1 ", out)
+	go diagnosis.Logger("2 ", out)
 	go monitoring.Dispatcher(monitors[0:], in)
 
-	time.Sleep(15 * time.Second)
+	time.Sleep(5 * time.Second)
 	done <- true
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 }
 
 func monitoringDemo() {
@@ -71,7 +72,7 @@ func loggingDemo() {
 
 func diagnosisDemo() {
 	c := make(chan *events.MonitoringEvent, 1)
-	go diagnosis.Logger(c)
+	go diagnosis.Logger("", c)
 
 	for i := 0; i < 10; i++ {
 		var evt events.MonitoringEvent
