@@ -10,8 +10,24 @@ import (
 )
 
 func main() {
+	totalDemo()
 
-	monitoringDemo()
+}
+
+func totalDemo() {
+	in := make(chan *events.InEvent, 1)
+	done := make(chan bool, 1)
+	var monitors [1]*monitoring.MonitorConfiguration
+	monitors[0] = monitoring.NewMonitorConfiguration(monitoring.Watchdog)
+	out := monitors[0].Out
+
+	go stubs.DemoLogHandler(in, done)
+	go diagnosis.Logger(out)
+	go monitoring.Dispatcher(monitors[0:], in)
+
+	time.Sleep(15 * time.Second)
+	done <- true
+	time.Sleep(1 * time.Second)
 }
 
 func monitoringDemo() {

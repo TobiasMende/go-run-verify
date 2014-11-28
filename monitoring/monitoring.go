@@ -49,12 +49,14 @@ End:
 			if ok {
 				for _, m := range monitors {
 					// TODO dispatching must be done in parallel (otherwise, slow monitors would affect the dispatching)
+					// alternative: select, default-case: put that channel to the end and report an error if the problem remains
 					m.In <- evt
 
 				}
 			} else {
 				for _, m := range monitors {
 					close(m.In)
+					close(m.Out)
 				}
 				break End
 			}
