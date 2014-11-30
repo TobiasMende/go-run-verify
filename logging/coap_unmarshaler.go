@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"github.com/TobiasMende/go-run-verify/events"
-	_ "github.com/dustin/go-coap"
+	"github.com/dustin/go-coap"
 	"time"
 )
 
@@ -24,7 +24,9 @@ func UnmarshalCoapMessage(msg interface{}) (evt events.InEvent, err error) {
 	timestamp, _ := binary.Varint(bytes[1:9])
 	evt.Created = time.Unix(timestamp, 0)
 
-	// TODO parse CoAP message
-	return evt, nil
+	message := coap.Message{}
+	err = message.UnmarshalBinary(bytes[9:])
+
+	return evt, err
 
 }
