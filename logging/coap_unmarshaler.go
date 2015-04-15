@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// TODO : add field for creator id (ip:port) to message format
 //UnmarshalCoapMessage expects a byte array as parameter and returns an InEvent
 // The expected message format is |1 byte EventType | 8 byte int64 timestamp | CoAP message |
 func UnmarshalCoapMessage(msg interface{}) (evt events.InEvent, err error) {
@@ -26,6 +27,9 @@ func UnmarshalCoapMessage(msg interface{}) (evt events.InEvent, err error) {
 
 	message := coap.Message{}
 	err = message.UnmarshalBinary(bytes[9:])
+
+	// TODO: try to parse payload of the message if content-format is available
+	evt.Content = message
 
 	return evt, err
 
