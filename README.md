@@ -5,11 +5,11 @@ i.e. a modular runtime verification system, in Go.
 
 The system currently consists of three layers:
 
-1. *The logging layer*
+1. *The logging layer:*
     The logging layer is responsible for receiving or extracting events from the system under scrutiny.
-1. *The monitoring layer*
+1. *The monitoring layer:*
     The monitoring layer receives events from the logging layer and may have multiple concurrent monitors, that verify system properties independently from each other.
-1. *The diagnosis layer*
+1. *The diagnosis layer:*
     The diagnosis layer receives status updates from the monitors and may extract a reason for the monitors verdict.
 
 ## Important Notes
